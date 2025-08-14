@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://ratna3.github.io/AnthropicCertification/sitemap.xml

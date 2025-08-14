@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Chat - AI Chat Interface with Model Control Protocol</title>
+    <meta name="description" content="MCP Chat is a command-line and web interface for interactive AI chat using Google Gemini API with extensible tool integrations via Model Control Protocol.">
+    <meta name="keywords" content="AI, Chat, Gemini, MCP, Model Control Protocol, Python, FastAPI">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="MCP Chat - AI Chat Interface">
+    <meta property="og:description" content="Interactive AI chat with Google Gemini API and extensible tool integrations via Model Control Protocol.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ratna3.github.io/AnthropicCertification/">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MCP Chat - AI Chat Interface">
+    <meta name="twitter:description" content="Interactive AI chat with Google Gemini API and extensible tool integrations via Model Control Protocol.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #4285f4;
+        }
+
+        .btn-primary:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #4285f4;
+            transform: translateY(-2px);
+        }
+
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            border: 1px solid #e9ecef;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .demo-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .demo-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .demo-content {
+            padding: 2rem;
+        }
+
+        .chat-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .message-demo {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message-demo.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content-demo {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message-demo.user .message-content-demo {
+            background: #4285f4;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .message-demo.bot .message-content-demo {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            margin-right: 10px;
+        }
+
+        .setup-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .setup-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            background: #4285f4;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .step h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">MCP Chat</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#setup">Setup</a></li>
+                <li><a href="https://github.com/ratna3/AnthropicCertification">GitHub</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>MCP Chat</h1>
+                <p>A powerful command-line and web interface for interactive AI chat using Google Gemini API with extensible tool integrations via the Model Control Protocol (MCP) architecture.</p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/ratna3/AnthropicCertification" class="btn btn-primary">View on GitHub</a>
+                    <a href="#setup" class="btn btn-secondary">Get Started</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-Powered Chat</h3>
+                        <p>Interactive chat capabilities with Google Gemini AI models, supporting both command-line and web interfaces.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📄</div>
+                        <h3>Document Retrieval</h3>
+                        <p>Use @ symbol followed by document ID to include document content in your queries for context-aware responses.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Command System</h3>
+                        <p>Execute commands with / prefix, featuring auto-completion and extensible command definitions via MCP server.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3>Extensible Tools</h3>
+                        <p>Built on Model Control Protocol (MCP) architecture for easy integration of new tools and capabilities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>Web & CLI Interface</h3>
+                        <p>Choose between a beautiful web interface or a powerful command-line interface based on your needs.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Fast Setup</h3>
+                        <p>Quick setup with uv package manager or traditional pip installation, with comprehensive documentation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="demo" class="demo-section">
+            <div class="container">
+                <h2 class="section-title">See It In Action</h2>
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <h3>MCP Gemini Chat Interface</h3>
+                        <p>Interactive AI Chat with Document Retrieval & Commands</p>
+                    </div>
+                    <div class="demo-content">
+                        <div class="chat-preview">
+                            <div class="message-demo user">
+                                <div class="message-content-demo">Tell me about @deposition.md</div>
+                            </div>
+                            <div class="message-demo bot">
+                                <div class="message-content-demo">I can help you analyze the deposition document. The document contains...</div>
+                            </div>
+                            <div class="message-demo user">
+                                <div class="message-content-demo">/summarize deposition.md</div>
+                            </div>
+                            <div class="message-demo bot">
+                                <div class="message-content-demo">Here's a summary of the deposition document: [Summary content would appear here]</div>
+                            </div>
+                        </div>
+                        <p><strong>Features demonstrated:</strong></p>
+                        <ul>
+                            <li>Document retrieval using @ symbol</li>
+                            <li>Command execution with / prefix</li>
+                            <li>Clean, intuitive chat interface</li>
+                            <li>Real-time AI responses</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="setup" class="setup-section">
+            <div class="container">
+                <h2 class="section-title">Quick Setup</h2>
+                <div class="setup-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Clone Repository</h3>
+                        <p>Clone the project from GitHub</p>
+                        <div class="code-block">
+git clone https://github.com/ratna3/AnthropicCertification.git
+cd AnthropicCertification
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Configure Environment</h3>
+                        <p>Set up your Gemini API key</p>
+                        <div class="code-block">
+# Create .env file
+GEMINI_API_KEY="your_api_key_here"
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Install Dependencies</h3>
+                        <p>Install with uv (recommended) or pip</p>
+                        <div class="code-block">
+# With uv (recommended)
+pip install uv
+uv venv && source .venv/bin/activate
+uv pip install -e .
+
+# Or with pip
+python -m venv .venv
+source .venv/bin/activate
+pip install google-generativeai python-dotenv prompt-toolkit "mcp[cli]==1.8.0" fastapi uvicorn
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Run the Application</h3>
+                        <p>Start the CLI or web interface</p>
+                        <div class="code-block">
+# Command-line interface
+python main.py
+
+# Web interface
+uvicorn simple_web_server:app --reload
+
+# Advanced web interface with MCP
+uvicorn web_server:app --reload
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <h3>Prerequisites</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✅ Python 3.9+</li>
+                        <li>✅ Google Gemini API Key</li>
+                        <li>✅ Internet connection</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/ratna3/AnthropicCertification">GitHub Repository</a>
+                <a href="https://github.com/ratna3/AnthropicCertification/issues">Report Issues</a>
+                <a href="https://ai.google.dev/">Google Gemini API</a>
+                <a href="https://modelcontextprotocol.io/">MCP Documentation</a>
+            </div>
+            <p>&copy; 2024 MCP Chat. Built with ❤️ for AI enthusiasts.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add some interactive animations
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.color = '#333';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.1)';
+                header.style.color = 'white';
+            }
+        });
+    </script>
+</body>
+</html>
