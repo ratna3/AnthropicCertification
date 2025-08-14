@@ -1,6 +1,14 @@
 # MCP Chat
 
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-blue?style=flat&logo=github)](https://ratna3.github.io/AnthropicCertification/)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue?style=flat&logo=python)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
+
 MCP Chat is a command-line interface application that enables interactive chat capabilities with AI models through the Google Gemini API. The application supports document retrieval, command-based prompts, and extensible tool integrations via the MCP (Model Control Protocol) architecture.
+
+## 🌐 Live Demo
+
+Visit our [GitHub Pages site](https://ratna3.github.io/AnthropicCertification/) to see the project showcase and documentation.
 
 ## Prerequisites
 
@@ -109,3 +117,50 @@ To fully implement the MCP features:
 ### Linting and Typing Check
 
 There are no lint or type checks implemented.
+
+## 🚀 Deployment & Hosting
+
+### GitHub Pages
+
+This project is automatically deployed to GitHub Pages using GitHub Actions. The live demo is available at: https://ratna3.github.io/AnthropicCertification/
+
+#### Deployment Process
+
+1. **Automatic Deployment**: Every push to the `main` branch triggers the GitHub Actions workflow
+2. **Static Site Generation**: The workflow builds a static site from the `docs/` directory
+3. **GitHub Pages**: The site is deployed to GitHub Pages with a custom domain support
+
+#### Manual Deployment Setup
+
+To set up GitHub Pages for your fork:
+
+1. Go to your repository settings
+2. Navigate to "Pages" in the left sidebar
+3. Under "Source", select "GitHub Actions"
+4. The deployment workflow will automatically run on the next push to `main`
+
+### Local Web Server
+
+Run the web interface locally for development:
+
+```bash
+# Simple web interface (no MCP features)
+uvicorn simple_web_server:app --reload --host 0.0.0.0 --port 8000
+
+# Full web interface with MCP support
+uvicorn web_server:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Production Deployment
+
+For production deployment of the full application:
+
+1. **Environment Setup**: Ensure all environment variables are properly configured
+2. **Dependencies**: Install production dependencies
+3. **ASGI Server**: Use a production ASGI server like Gunicorn with Uvicorn workers
+4. **Reverse Proxy**: Set up Nginx or similar for SSL termination and load balancing
+
+```bash
+# Production server example
+gunicorn web_server:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+```
